@@ -165,27 +165,23 @@ export default function Thread() {
                                 onChange={setContent}
                                 language={codeLanguage}
                                 className="min-h-[120px]"
+                                shortcutHint={`⌘ + Enter ${t('shortcut.send')}`}
                             />
                         </div>
-                        <div className="flex items-center justify-between mt-3">
-                            <div className="flex items-center gap-3">
-                                <LanguageSelect value={codeLanguage} onChange={setCodeLanguage} />
-                                <button
-                                    onClick={handleSend}
-                                    disabled={!content.trim() || createMessage.isPending}
-                                    className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors"
-                                >
-                                    {createMessage.isPending ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <Send className="w-4 h-4" />
-                                    )}
-                                    {t('thread.send')}
-                                </button>
-                            </div>
-                            <span className="text-xs text-[hsl(var(--muted-foreground))]">
-                                ⌘ + Enter {t('shortcut.send')}
-                            </span>
+                        <div className="flex items-center gap-3 mt-3">
+                            <LanguageSelect value={codeLanguage} onChange={setCodeLanguage} />
+                            <button
+                                onClick={handleSend}
+                                disabled={!content.trim() || createMessage.isPending}
+                                className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors"
+                            >
+                                {createMessage.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Send className="w-4 h-4" />
+                                )}
+                                {t('thread.send')}
+                            </button>
                         </div>
                     </div>
                 </div>
