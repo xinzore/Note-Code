@@ -4,7 +4,7 @@ type Language = 'tr' | 'en';
 
 const translations = {
     tr: {
-        'site.name': 'Kod',
+        'site.name': 'Not',
         'site.name.highlight': 'Sync',
         'home.title': 'Yapıştır, Kaydet, Senkronize Et.',
         'home.description': 'Kod parçalarını hızlıca paylaşın. Yapıştır, kaydet ve benzersiz bir bağlantı oluştur.',
@@ -22,9 +22,10 @@ const translations = {
         'thread.send': 'Gönder',
         'message.copy': 'Kopyala',
         'message.copied': 'Kopyalandı',
+        'shortcut.send': 'ile gönder',
     },
     en: {
-        'site.name': 'Code',
+        'site.name': 'Note',
         'site.name.highlight': 'Sync',
         'home.title': 'Paste, Save, Sync.',
         'home.description': 'Quickly share code snippets. Paste, save and create a unique link.',
@@ -42,6 +43,7 @@ const translations = {
         'thread.send': 'Send',
         'message.copy': 'Copy',
         'message.copied': 'Copied',
+        'shortcut.send': 'to send',
     },
 };
 

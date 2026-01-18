@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'wouter';
 import { Send, Link as LinkIcon, Lock, LockOpen, Loader2, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
@@ -21,13 +21,25 @@ export default function Thread() {
 
     const isLocked = thread?.locked ?? false;
 
-    const handleSend = () => {
-        if (!content.trim() || isLocked) return;
+    const handleSend = useCallback(() => {
+        if (!content.trim() || isLocked || createMessage.isPending) return;
         createMessage.mutate(
             { content, language: codeLanguage },
             { onSuccess: () => setContent('') }
         );
-    };
+    }, [content, isLocked, createMessage, codeLanguage]);
+
+    // Keyboard shortcut: Cmd/Ctrl + Enter to send
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                handleSend();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleSend]);
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -155,20 +167,25 @@ export default function Thread() {
                                 className="min-h-[120px]"
                             />
                         </div>
-                        <div className="flex items-center gap-3 mt-3">
-                            <LanguageSelect value={codeLanguage} onChange={setCodeLanguage} />
-                            <button
-                                onClick={handleSend}
-                                disabled={!content.trim() || createMessage.isPending}
-                                className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors"
-                            >
-                                {createMessage.isPending ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                    <Send className="w-4 h-4" />
-                                )}
-                                {t('thread.send')}
-                            </button>
+                        <div className="flex items-center justify-between mt-3">
+                            <div className="flex items-center gap-3">
+                                <LanguageSelect value={codeLanguage} onChange={setCodeLanguage} />
+                                <button
+                                    onClick={handleSend}
+                                    disabled={!content.trim() || createMessage.isPending}
+                                    className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                                >
+                                    {createMessage.isPending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Send className="w-4 h-4" />
+                                    )}
+                                    {t('thread.send')}
+                                </button>
+                            </div>
+                            <span className="text-xs text-[hsl(var(--muted-foreground))]">
+                                ⌘ + Enter {t('shortcut.send')}
+                            </span>
                         </div>
                     </div>
                 </div>
