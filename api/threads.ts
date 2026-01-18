@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { db } from './lib/db';
-import { threads, messages } from './lib/schema';
+import { db } from './lib/db.js';
+import { threads, messages } from './lib/schema.js';
 
 function generateSlug(length = 4): string {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
