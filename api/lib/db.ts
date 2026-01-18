@@ -4,6 +4,10 @@ import * as schema from './schema.js';
 
 const { Pool } = pg;
 
+if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL is not set!');
+}
+
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
 });
