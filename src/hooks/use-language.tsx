@@ -4,7 +4,7 @@ type Language = 'tr' | 'en';
 
 const translations = {
     tr: {
-        'site.name': 'Not',
+        'site.name': 'Kod',
         'site.name.highlight': 'Sync',
         'home.title': 'Yapıştır, Kaydet, Senkronize Et.',
         'home.description': 'Kod parçalarını hızlıca paylaşın. Yapıştır, kaydet ve benzersiz bir bağlantı oluştur.',
@@ -25,7 +25,7 @@ const translations = {
         'shortcut.send': 'ile gönder',
     },
     en: {
-        'site.name': 'Note',
+        'site.name': 'Code',
         'site.name.highlight': 'Sync',
         'home.title': 'Paste, Save, Sync.',
         'home.description': 'Quickly share code snippets. Paste, save and create a unique link.',
