@@ -29,12 +29,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const slug = generateSlug();
 
         const [thread] = await db.insert(threads).values({ slug }).returning();
-        const [message] = await db.insert(messages).values({
+        await db.insert(messages).values({
             threadId: thread.id,
             content: initialContent,
             language,
             isCode: true,
-        }).returning();
+        });
 
         return res.status(201).json({ slug: thread.slug, threadId: thread.id });
     } catch (error) {
