@@ -14,6 +14,7 @@ interface CodeEditorProps {
     language?: string;
     readOnly?: boolean;
     className?: string;
+    shortcutHint?: string;
 }
 
 export function CodeEditor({
@@ -22,6 +23,7 @@ export function CodeEditor({
     language = 'javascript',
     readOnly = false,
     className,
+    shortcutHint,
 }: CodeEditorProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const highlightRef = useRef<HTMLPreElement>(null);
@@ -65,6 +67,12 @@ export function CodeEditor({
                 spellCheck={false}
                 placeholder="Kodunuzu buraya yazın..."
             />
+            {shortcutHint && (
+                <span className="absolute bottom-3 right-3 text-xs text-[hsl(var(--muted-foreground))] opacity-50 pointer-events-none">
+                    {shortcutHint}
+                </span>
+            )}
         </div>
     );
 }
+
