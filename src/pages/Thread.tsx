@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'wouter';
-import { Code2, Send, Link as LinkIcon, Lock, LockOpen, Loader2, AlertCircle } from 'lucide-react';
+import { Send, Link as LinkIcon, Lock, LockOpen, Loader2, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { useThread, useCreateMessage, useLockThread } from '@/hooks/use-threads';
 import { CodeEditor } from '@/components/CodeEditor';
@@ -13,7 +13,7 @@ export default function Thread() {
     const { slug } = useParams<{ slug: string }>();
     const { t } = useLanguage();
     const [content, setContent] = useState('');
-    const [language, setLanguage] = useState('javascript');
+    const [codeLanguage, setCodeLanguage] = useState('javascript');
 
     const { data: thread, isLoading, isError } = useThread(slug!);
     const createMessage = useCreateMessage(slug!);
@@ -24,7 +24,7 @@ export default function Thread() {
     const handleSend = () => {
         if (!content.trim() || isLocked) return;
         createMessage.mutate(
-            { content, language },
+            { content, language: codeLanguage },
             { onSuccess: () => setContent('') }
         );
     };
@@ -70,15 +70,15 @@ export default function Thread() {
                     <div className="flex items-center gap-3">
                         <Link href="/">
                             <a className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                                    <Code2 className="w-5 h-5 text-primary" />
-                                </div>
                                 <h1 className="text-lg font-bold">
                                     {t('site.name')}
                                     <span className="text-primary">{t('site.name.highlight')}</span>
                                 </h1>
                             </a>
                         </Link>
+                        <span className="text-sm text-[hsl(var(--muted-foreground))] bg-[hsl(var(--muted))] px-2 py-1 rounded font-mono">
+                            /{slug}
+                        </span>
                         {isLocked && (
                             <span className="flex items-center gap-1 text-xs bg-amber-500/20 text-amber-500 px-2 py-1 rounded">
                                 <Lock className="w-3 h-3" />
@@ -136,6 +136,7 @@ export default function Thread() {
                             content={msg.content}
                             language={msg.language}
                             timestamp={msg.created_at}
+                            timezone={msg.timezone}
                             isFirst={idx === 0}
                         />
                     ))}
@@ -150,12 +151,12 @@ export default function Thread() {
                             <CodeEditor
                                 value={content}
                                 onChange={setContent}
-                                language={language}
+                                language={codeLanguage}
                                 className="min-h-[120px]"
                             />
                         </div>
                         <div className="flex items-center gap-3 mt-3">
-                            <LanguageSelect value={language} onChange={setLanguage} />
+                            <LanguageSelect value={codeLanguage} onChange={setCodeLanguage} />
                             <button
                                 onClick={handleSend}
                                 disabled={!content.trim() || createMessage.isPending}

@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark theme (default) */
 :root {
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;
@@ -10,8 +11,21 @@
   --muted: 217.2 32.6% 17.5%;
   --muted-foreground: 215 20.2% 65.1%;
   --border: 217.2 32.6% 17.5%;
-  --card: 222.2 84% 4.9%;
+  --card: 222.2 84% 8%;
   --card-foreground: 210 40% 98%;
+}
+
+/* Light theme */
+body.light {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --primary: 239 84% 67%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215 16% 47%;
+  --border: 214.3 31.8% 91.4%;
+  --card: 0 0% 98%;
+  --card-foreground: 222.2 84% 4.9%;
 }
 
 * {
@@ -22,9 +36,10 @@ body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-/* Prism.js overrides */
+/* Prism.js overrides - dark mode */
 pre[class*="language-"],
 code[class*="language-"] {
   background: transparent !important;
@@ -32,13 +47,62 @@ code[class*="language-"] {
   font-family: 'Fira Code', 'Consolas', monospace;
 }
 
-.token.comment { color: #6b7280; }
-.token.keyword { color: #c084fc; }
-.token.string { color: #4ade80; }
-.token.function { color: #60a5fa; }
-.token.number { color: #f97316; }
-.token.operator { color: #94a3b8; }
-.token.punctuation { color: #94a3b8; }
+.token.comment {
+  color: #6b7280;
+}
+
+.token.keyword {
+  color: #c084fc;
+}
+
+.token.string {
+  color: #4ade80;
+}
+
+.token.function {
+  color: #60a5fa;
+}
+
+.token.number {
+  color: #f97316;
+}
+
+.token.operator {
+  color: #94a3b8;
+}
+
+.token.punctuation {
+  color: #94a3b8;
+}
+
+/* Light mode prism overrides */
+body.light .token.comment {
+  color: #6b7280;
+}
+
+body.light .token.keyword {
+  color: #7c3aed;
+}
+
+body.light .token.string {
+  color: #16a34a;
+}
+
+body.light .token.function {
+  color: #2563eb;
+}
+
+body.light .token.number {
+  color: #ea580c;
+}
+
+body.light .token.operator {
+  color: #475569;
+}
+
+body.light .token.punctuation {
+  color: #475569;
+}
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
@@ -62,8 +126,15 @@ code[class*="language-"] {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {

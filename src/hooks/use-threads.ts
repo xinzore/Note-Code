@@ -15,7 +15,13 @@ interface Message {
     content: string;
     language: string;
     is_code: boolean;
+    timezone: string;
     created_at: string;
+}
+
+// Get user's timezone
+function getUserTimezone(): string {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 function generateSlug(length = 4): string {
@@ -49,6 +55,7 @@ export function useCreateThread() {
                     content: data.initialContent,
                     language: data.language || 'javascript',
                     is_code: true,
+                    timezone: getUserTimezone(),
                 });
 
             if (messageError) throw messageError;
@@ -110,6 +117,7 @@ export function useCreateMessage(slug: string) {
                     content: data.content,
                     language: data.language || 'javascript',
                     is_code: true,
+                    timezone: getUserTimezone(),
                 })
                 .select()
                 .single();

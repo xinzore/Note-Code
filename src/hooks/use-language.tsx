@@ -20,6 +20,8 @@ const translations = {
         'thread.locked': 'Kilitli',
         'thread.lockedBanner': 'Bu thread kilitli - yeni içerik eklenemez.',
         'thread.send': 'Gönder',
+        'message.copy': 'Kopyala',
+        'message.copied': 'Kopyalandı',
     },
     en: {
         'site.name': 'Note',
@@ -38,6 +40,8 @@ const translations = {
         'thread.locked': 'Locked',
         'thread.lockedBanner': 'This thread is locked - no new content can be added.',
         'thread.send': 'Send',
+        'message.copy': 'Copy',
+        'message.copied': 'Copied',
     },
 };
 
