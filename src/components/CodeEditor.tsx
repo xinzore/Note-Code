@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import Prism from 'prismjs';
-// Dil importları aynen kalsın...
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-python';
@@ -28,11 +27,10 @@ export function CodeEditor({
 }: CodeEditorProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const preRef = useRef<HTMLPreElement>(null);
+    const lineNumbersRef = useRef<HTMLDivElement>(null); // 1. Yeni Ref: Satır numaraları için
 
-    // HATA 3 Çözümü: Sadece highlight işlemi için
     useEffect(() => {
         if (preRef.current) {
-            // Prism'in DOM'u güncellemesine izin veriyoruz
             const codeElement = preRef.current.querySelector('code');
             if (codeElement) {
                 Prism.highlightElement(codeElement);
@@ -40,87 +38,107 @@ export function CodeEditor({
         }
     }, [value, language]);
 
+    // 2. Satır Sayısını Hesapla
+    // useMemo kullanarak sadece value değiştiğinde hesaplamasını sağlıyoruz (performans için)
+    const lineCount = useMemo(() => value.split('\n').length, [value]);
+    const lines = useMemo(() => Array.from({ length: lineCount }, (_, i) => i + 1), [lineCount]);
+
     const handleScroll = () => {
-        if (textareaRef.current && preRef.current) {
+        if (textareaRef.current && preRef.current && lineNumbersRef.current) {
+            // Kod Highlight sync
             preRef.current.scrollTop = textareaRef.current.scrollTop;
             preRef.current.scrollLeft = textareaRef.current.scrollLeft;
+            
+            // 3. Satır Numarası Sync (Sadece dikey scroll)
+            lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
         }
     };
 
-    // HATA 1 Çözümü: Sondaki yeni satır sorununu fixlemek için
-    // Eğer kod \n ile bitiyorsa, görsel olarak render olması için sonuna boşluk ekliyoruz.
-    const renderValue = value.endsWith('\n') ? value + ' ' : value;
-
-    // Ortak stil sınıfı (Hizalama için hayati önem taşır)
-    const commonStyles = "font-mono text-sm leading-6 p-4";
-
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Tab') {
-        e.preventDefault();
-        
-        const start = e.currentTarget.selectionStart;
-        const end = e.currentTarget.selectionEnd;
-        const target = e.currentTarget;
-        
-        // Tab karakteri (veya 2/4 boşluk) ekle
-        const spaces = '  '; // İstersen '\t' yap
-        const newValue = value.substring(0, start) + spaces + value.substring(end);
-        
-        // Değeri güncelle
-        onChange?.(newValue);
-        
-        // İmleci doğru yere taşı (React render sonrası çalışması için setTimeout gerekebilir 
-        // ama modern tarayıcılarda senkron da yiyebiliyor, garanti olsun diye setTimeout)
-        setTimeout(() => {
-            target.selectionStart = target.selectionEnd = start + spaces.length;
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = e.currentTarget.selectionStart;
+            const end = e.currentTarget.selectionEnd;
+            const target = e.currentTarget;
+            const spaces = '  ';
+            const newValue = value.substring(0, start) + spaces + value.substring(end);
+            onChange?.(newValue);
+            setTimeout(() => {
+                target.selectionStart = target.selectionEnd = start + spaces.length;
             }, 0);
         }
     };
 
+    const renderValue = value.endsWith('\n') ? value + ' ' : value;
+
+    // Ortak stiller: Satır numaraları ve kodun birebir aynı hizada olması şart
+    const commonFontStyles = "font-mono text-sm leading-6"; 
+
     if (readOnly) {
+         // ReadOnly için de basit bir görünüm (isteğe bağlı buraya da satır no eklenebilir ama şimdilik sade bıraktım)
         return (
-            <pre className={cn('rounded-lg bg-black/50 overflow-auto', commonStyles, className)}>
+            <pre className={cn('p-4 rounded-lg bg-black/50 overflow-auto', commonFontStyles, className)}>
                 <code className={`language-${language}`}>{value}</code>
             </pre>
         );
     }
 
     return (
-        <div className={cn('relative h-[200px]', className)}> {/* Yükseklik verdim */}
-            {/* Highlight Katmanı (Alt) */}
-            <pre
-                ref={preRef}
+        <div className={cn('relative h-[300px] flex rounded-lg bg-black/30 border border-white/10 overflow-hidden', className)}>
+            {/* 4. SOL SÜTUN: Satır Numaraları */}
+            <div
+                ref={lineNumbersRef}
                 className={cn(
-                    "absolute inset-0 m-0 overflow-hidden pointer-events-none bg-black/30 rounded-lg whitespace-pre", // whitespace-pre önemli
-                    commonStyles
+                    "flex-shrink-0 w-12 text-right select-none opacity-30 bg-black/20 overflow-hidden pt-4 pb-4 pr-3", // Paddingler textarea ile aynı olmalı (pt-4)
+                    commonFontStyles
                 )}
                 aria-hidden="true"
             >
-                <code className={`language-${language} block min-h-full`}>
-                    {renderValue || ' '}
-                </code>
-            </pre>
+                {lines.map((line) => (
+                    <div key={line} className="text-white">
+                        {line}
+                    </div>
+                ))}
+            </div>
 
-            {/* Editor Katmanı (Üst) */}
-            <textarea
-                ref={textareaRef}
-                value={value}
-                onChange={(e) => onChange?.(e.target.value)}
-                onScroll={handleScroll}
-                className={cn(
-                    "absolute inset-0 w-full h-full bg-transparent resize-none outline-none text-transparent caret-white rounded-lg whitespace-pre overflow-auto",
-                     commonStyles
-                )}
-                spellCheck={false}
-                autoCapitalize="off"
-                autoComplete="off"
-                autoCorrect="off"
-                placeholder="Kodunuzu buraya yazın..."
-                onKeyDown={handleKeyDown}
-            />
-            
+            {/* SAĞ SÜTUN: Editör Alanı */}
+            <div className="relative flex-1 h-full min-w-0"> {/* min-w-0 flex taşmasını önler */}
+                
+                {/* Highlight Katmanı */}
+                <pre
+                    ref={preRef}
+                    className={cn(
+                        "absolute inset-0 m-0 overflow-hidden pointer-events-none whitespace-pre p-4 pl-2", // pl-2 ile numaralarla kod arasına hafif boşluk
+                        commonFontStyles
+                    )}
+                    aria-hidden="true"
+                >
+                    <code className={`language-${language} block min-h-full`}>
+                        {renderValue || ' '}
+                    </code>
+                </pre>
+
+                {/* Input Katmanı */}
+                <textarea
+                    ref={textareaRef}
+                    value={value}
+                    onChange={(e) => onChange?.(e.target.value)}
+                    onScroll={handleScroll}
+                    onKeyDown={handleKeyDown}
+                    className={cn(
+                        "absolute inset-0 w-full h-full bg-transparent resize-none outline-none text-transparent caret-white whitespace-pre overflow-auto p-4 pl-2", // pl-2
+                        commonFontStyles
+                    )}
+                    spellCheck={false}
+                    autoCapitalize="off"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    placeholder="Kodunuzu buraya yazın..."
+                />
+            </div>
+
             {shortcutHint && (
-                <span className="absolute bottom-3 right-3 text-xs text-muted-foreground opacity-50 pointer-events-none z-10">
+                <span className="absolute bottom-3 right-3 text-xs text-muted-foreground opacity-50 pointer-events-none z-10 bg-black/50 px-2 py-1 rounded">
                     {shortcutHint}
                 </span>
             )}
