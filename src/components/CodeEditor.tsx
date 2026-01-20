@@ -51,7 +51,7 @@ export function CodeEditor({
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (readOnly) return; // ReadOnly ise tuşları dinleme
-        
+
         if (e.key === 'Tab') {
             e.preventDefault();
             const start = e.currentTarget.selectionStart;
@@ -72,7 +72,7 @@ export function CodeEditor({
     return (
         // Flex container styles updated
         <div className={cn(
-            'relative flex rounded-lg bg-black/30 border border-white/10 overflow-hidden', 
+            'relative flex rounded-lg bg-[hsl(var(--editor-bg))] border border-[hsl(var(--border))] overflow-hidden',
             // ReadOnly değilse belirli bir yükseklik, readOnly ise içerik kadar uzasın (veya senin tercihin)
             !readOnly ? 'h-[300px]' : 'h-auto',
             className
@@ -81,13 +81,13 @@ export function CodeEditor({
             <div
                 ref={lineNumbersRef}
                 className={cn(
-                    "flex-shrink-0 w-12 text-right select-none opacity-30 bg-black/20 overflow-hidden pt-4 pb-4 pr-3",
+                    "flex-shrink-0 w-12 text-right select-none opacity-50 bg-[hsl(var(--muted))] overflow-hidden pt-4 pb-4 pr-3",
                     commonFontStyles
                 )}
                 aria-hidden="true"
             >
                 {lines.map((line) => (
-                    <div key={line} className="text-white">
+                    <div key={line} className="text-[hsl(var(--foreground))]">
                         {line}
                     </div>
                 ))}
@@ -119,8 +119,8 @@ export function CodeEditor({
                     readOnly={readOnly}
                     className={cn(
                         "w-full h-full bg-transparent resize-none outline-none text-transparent whitespace-pre overflow-auto p-4 pl-2",
-                        // ReadOnly ise caret (imleç) rengini gizle, değilse beyaz yap
-                        readOnly ? "cursor-text caret-transparent" : "caret-white",
+                        // ReadOnly ise caret (imleç) rengini gizle, değilse tema rengine göre ayarla
+                        readOnly ? "cursor-text caret-transparent" : "caret-[hsl(var(--foreground))]",
                         // ReadOnly modda scrollbar gizlenebilir veya style verilebilir
                         commonFontStyles
                     )}
