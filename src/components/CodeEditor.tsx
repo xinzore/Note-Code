@@ -52,7 +52,30 @@ export function CodeEditor({
     const renderValue = value.endsWith('\n') ? value + ' ' : value;
 
     // Ortak stil sınıfı (Hizalama için hayati önem taşır)
-    const commonStyles = "font-mono text-sm leading-6 p-4"; 
+    const commonStyles = "font-mono text-sm leading-6 p-4";
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        
+        const start = e.currentTarget.selectionStart;
+        const end = e.currentTarget.selectionEnd;
+        const target = e.currentTarget;
+        
+        // Tab karakteri (veya 2/4 boşluk) ekle
+        const spaces = '  '; // İstersen '\t' yap
+        const newValue = value.substring(0, start) + spaces + value.substring(end);
+        
+        // Değeri güncelle
+        onChange?.(newValue);
+        
+        // İmleci doğru yere taşı (React render sonrası çalışması için setTimeout gerekebilir 
+        // ama modern tarayıcılarda senkron da yiyebiliyor, garanti olsun diye setTimeout)
+        setTimeout(() => {
+            target.selectionStart = target.selectionEnd = start + spaces.length;
+            }, 0);
+        }
+    };
 
     if (readOnly) {
         return (
@@ -93,6 +116,7 @@ export function CodeEditor({
                 autoComplete="off"
                 autoCorrect="off"
                 placeholder="Kodunuzu buraya yazın..."
+                onKeyDown={handleKeyDown}
             />
             
             {shortcutHint && (
