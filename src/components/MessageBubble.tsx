@@ -46,7 +46,7 @@ export function MessageBubble({ content, language, timestamp, timezone = 'Europe
 
             {/* KART YAPISI */}
             <div className="relative bg-[hsl(var(--card))] rounded-lg border border-[hsl(var(--border))] overflow-hidden group">
-                
+
                 {/* HEADER: Trafik Işıkları ve Copy Butonu (Aynen koruduk) */}
                 <div className="flex items-center justify-between px-3 py-2 bg-[hsl(var(--muted))] border-b border-[hsl(var(--border))]">
                     <div className="flex items-center gap-1.5">
@@ -82,7 +82,7 @@ export function MessageBubble({ content, language, timestamp, timezone = 'Europe
                     value={content}
                     language={language}
                     readOnly={true}
-                    className="border-none rounded-none bg-transparent" 
+                    className="border-none rounded-none bg-transparent"
                 />
             </div>
         </div>

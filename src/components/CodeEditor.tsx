@@ -73,8 +73,10 @@ export function CodeEditor({
         // Flex container styles updated
         <div className={cn(
             'relative flex rounded-lg bg-[hsl(var(--editor-bg))] border border-[hsl(var(--border))] overflow-hidden',
-            // ReadOnly değilse belirli bir yükseklik, readOnly ise içerik kadar uzasın (veya senin tercihin)
+            // ReadOnly değilse belirli bir yükseklik, readOnly ise içerik kadar uzasın
             !readOnly ? 'h-[300px]' : 'h-auto',
+            // ReadOnly modda scrollbar gizle
+            readOnly && 'hide-scrollbar',
             className
         )}>
             {/* Satır Numaraları */}
@@ -95,41 +97,42 @@ export function CodeEditor({
 
             {/* Editör Alanı */}
             <div className="relative flex-1 min-w-0 group">
+                {/* Syntax highlighted pre - her zaman göster */}
                 <pre
                     ref={preRef}
                     className={cn(
-                        "absolute inset-0 m-0 overflow-hidden pointer-events-none whitespace-pre p-4 pl-2",
-                        // ReadOnly modda position absolute yerine relative kullanabiliriz ki yükseklik otomatik artsın
-                        // Ama şimdilik yapıyı bozmuyorum, textarea boyutu belirleyecek.
+                        "m-0 whitespace-pre p-4 pl-2",
+                        readOnly
+                            ? "overflow-auto hide-scrollbar"
+                            : "absolute inset-0 overflow-hidden pointer-events-none",
                         commonFontStyles
                     )}
-                    aria-hidden="true"
                 >
                     <code className={`language-${language} block min-h-full`}>
                         {renderValue || ' '}
                     </code>
                 </pre>
 
-                <textarea
-                    ref={textareaRef}
-                    value={value}
-                    onChange={(e) => !readOnly && onChange?.(e.target.value)}
-                    onScroll={handleScroll}
-                    onKeyDown={handleKeyDown}
-                    readOnly={readOnly}
-                    className={cn(
-                        "w-full h-full bg-transparent resize-none outline-none text-transparent whitespace-pre overflow-auto p-4 pl-2",
-                        // ReadOnly ise caret (imleç) rengini gizle, değilse tema rengine göre ayarla
-                        readOnly ? "cursor-text caret-transparent" : "caret-[hsl(var(--foreground))]",
-                        // ReadOnly modda scrollbar gizlenebilir veya style verilebilir
-                        commonFontStyles
-                    )}
-                    spellCheck={false}
-                    autoCapitalize="off"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    placeholder={readOnly ? "" : "Kodunuzu buraya yazın..."}
-                />
+                {/* Edit modda transparent textarea (seçim için) */}
+                {!readOnly && (
+                    <textarea
+                        ref={textareaRef}
+                        value={value}
+                        onChange={(e) => onChange?.(e.target.value)}
+                        onScroll={handleScroll}
+                        onKeyDown={handleKeyDown}
+                        className={cn(
+                            "w-full h-full bg-transparent resize-none outline-none whitespace-pre overflow-auto p-4 pl-2",
+                            "text-transparent caret-[hsl(var(--foreground))] code-editor-selection",
+                            commonFontStyles
+                        )}
+                        spellCheck={false}
+                        autoCapitalize="off"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        placeholder="Kodunuzu buraya yazın..."
+                    />
+                )}
             </div>
 
             {shortcutHint && !readOnly && (

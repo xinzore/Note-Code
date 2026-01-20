@@ -145,3 +145,25 @@ body.light .token.punctuation {
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* Hide only vertical scrollbar in message bubble code blocks */
+.hide-scrollbar {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* For Chromium - hide only vertical scrollbar */
+.hide-scrollbar::-webkit-scrollbar:vertical {
+  display: none;
+}
+
+/* Semi-transparent selection for code editor textarea - shows syntax highlighting through */
+.code-editor-selection::selection {
+  background: rgba(99, 102, 241, 0.4);
+  color: transparent;
+}
+
+.code-editor-selection::-moz-selection {
+  background: rgba(99, 102, 241, 0.4);
+  color: transparent;
+}
