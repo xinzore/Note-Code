@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Prism from 'prismjs';
+// Dil importları aynen kalsın...
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-python';
@@ -26,53 +27,79 @@ export function CodeEditor({
     shortcutHint,
 }: CodeEditorProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const highlightRef = useRef<HTMLPreElement>(null);
+    const preRef = useRef<HTMLPreElement>(null);
 
+    // HATA 3 Çözümü: Sadece highlight işlemi için
     useEffect(() => {
-        if (highlightRef.current) {
-            Prism.highlightElement(highlightRef.current.querySelector('code')!);
+        if (preRef.current) {
+            // Prism'in DOM'u güncellemesine izin veriyoruz
+            const codeElement = preRef.current.querySelector('code');
+            if (codeElement) {
+                Prism.highlightElement(codeElement);
+            }
         }
     }, [value, language]);
 
     const handleScroll = () => {
-        if (textareaRef.current && highlightRef.current) {
-            highlightRef.current.scrollTop = textareaRef.current.scrollTop;
-            highlightRef.current.scrollLeft = textareaRef.current.scrollLeft;
+        if (textareaRef.current && preRef.current) {
+            preRef.current.scrollTop = textareaRef.current.scrollTop;
+            preRef.current.scrollLeft = textareaRef.current.scrollLeft;
         }
     };
 
+    // HATA 1 Çözümü: Sondaki yeni satır sorununu fixlemek için
+    // Eğer kod \n ile bitiyorsa, görsel olarak render olması için sonuna boşluk ekliyoruz.
+    const renderValue = value.endsWith('\n') ? value + ' ' : value;
+
+    // Ortak stil sınıfı (Hizalama için hayati önem taşır)
+    const commonStyles = "font-mono text-sm leading-6 p-4"; 
+
     if (readOnly) {
         return (
-            <pre className={cn('p-4 rounded-lg bg-black/50 overflow-auto', className)}>
+            <pre className={cn('rounded-lg bg-black/50 overflow-auto', commonStyles, className)}>
                 <code className={`language-${language}`}>{value}</code>
             </pre>
         );
     }
 
     return (
-        <div className={cn('relative font-mono text-sm', className)}>
+        <div className={cn('relative h-[200px]', className)}> {/* Yükseklik verdim */}
+            {/* Highlight Katmanı (Alt) */}
             <pre
-                ref={highlightRef}
-                className="absolute inset-0 p-4 overflow-auto pointer-events-none bg-black/30 rounded-lg"
+                ref={preRef}
+                className={cn(
+                    "absolute inset-0 m-0 overflow-hidden pointer-events-none bg-black/30 rounded-lg whitespace-pre", // whitespace-pre önemli
+                    commonStyles
+                )}
                 aria-hidden="true"
             >
-                <code className={`language-${language}`}>{value || ' '}</code>
+                <code className={`language-${language} block min-h-full`}>
+                    {renderValue || ' '}
+                </code>
             </pre>
+
+            {/* Editor Katmanı (Üst) */}
             <textarea
                 ref={textareaRef}
                 value={value}
                 onChange={(e) => onChange?.(e.target.value)}
                 onScroll={handleScroll}
-                className="relative w-full h-full p-4 bg-transparent resize-none outline-none text-transparent caret-white rounded-lg min-h-[200px]"
+                className={cn(
+                    "absolute inset-0 w-full h-full bg-transparent resize-none outline-none text-transparent caret-white rounded-lg whitespace-pre overflow-auto",
+                     commonStyles
+                )}
                 spellCheck={false}
+                autoCapitalize="off"
+                autoComplete="off"
+                autoCorrect="off"
                 placeholder="Kodunuzu buraya yazın..."
             />
+            
             {shortcutHint && (
-                <span className="absolute bottom-3 right-3 text-xs text-[hsl(var(--muted-foreground))] opacity-50 pointer-events-none">
+                <span className="absolute bottom-3 right-3 text-xs text-muted-foreground opacity-50 pointer-events-none z-10">
                     {shortcutHint}
                 </span>
             )}
         </div>
     );
 }
-
